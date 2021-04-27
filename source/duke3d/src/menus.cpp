@@ -982,7 +982,7 @@ static MenuRangeInt32_t MEO_JOYSTICK_VIEW_CENTERING = MAKE_MENURANGE(&ud.config.
 static MenuEntry_t ME_JOYSTICK_VIEW_CENTERING = MAKE_MENUENTRY( "View centering", &MF_Redfont, &MEF_BigSliders, &MEO_JOYSTICK_VIEW_CENTERING, RangeInt32 );
 
 static MenuOption_t MEO_JOYSTICK_VIEW_LEVELING = MAKE_MENUOPTION( &MF_Redfont, &MEOS_NoYes, &ud.config.JoystickViewLeveling );
-static MenuEntry_t ME_JOYSTICK_VIEW_LEVELING = MAKE_MENUENTRY( "View leveling:", &MF_Redfont, &MEF_BigOptionsRt, &MEO_JOYSTICK_VIEW_LEVELING, Option );
+static MenuEntry_t ME_JOYSTICK_VIEW_LEVELING = MAKE_MENUENTRY( "Vertical aim assist:", &MF_Redfont, &MEF_BigOptionsRt, &MEO_JOYSTICK_VIEW_LEVELING, Option );
 
 static MenuEntry_t *MEL_JOYSTICKSETUP[] = {
     &ME_JOYSTICK_ENABLE,
@@ -2310,6 +2310,7 @@ static void Menu_Pre(MenuID_t cm)
         MenuEntry_DisableOnCondition(&ME_JOYSTICK_EDITBUTTONS, !CONTROL_JoyPresent || (joystick.numButtons == 0 && joystick.numHats == 0));
         MenuEntry_DisableOnCondition(&ME_JOYSTICK_EDITAXES, !CONTROL_JoyPresent || joystick.numAxes == 0);
         MenuEntry_DisableOnCondition(&ME_JOYSTICK_DEFAULTS, !joystick.isGameController);
+        MenuEntry_DisableOnCondition(&ME_JOYSTICK_VIEW_LEVELING, !ud.config.JoystickViewCentering);
         break;
 
 #ifndef EDUKE32_RETAIL_MENU
