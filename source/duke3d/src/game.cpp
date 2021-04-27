@@ -4022,18 +4022,19 @@ void G_DoSpriteAnimations(int32_t ourx, int32_t oury, int32_t ourz, int32_t oura
                 if (tilehasmodelorvoxel(t->picnum, t->pal))
                 {
                     static int32_t targetang = 0;
+                    uint32_t const extBits = g_player[playerNum].input.extbits;
 
-                    if (g_player[playerNum].input.extbits&(1<<1))
+                    if (extBits&BIT(EXT_BACK))
                     {
-                        if (g_player[playerNum].input.extbits&(1<<2))targetang += 16;
-                        else if (g_player[playerNum].input.extbits&(1<<3)) targetang -= 16;
+                        if (extBits&BIT(EXT_STRAFELEFT)) targetang += 16;
+                        else if (extBits&BIT(EXT_STRAFERIGHT)) targetang -= 16;
                         else if (targetang > 0) targetang -= targetang>>2;
                         else if (targetang < 0) targetang += (-targetang)>>2;
                     }
                     else
                     {
-                        if (g_player[playerNum].input.extbits&(1<<2))targetang -= 16;
-                        else if (g_player[playerNum].input.extbits&(1<<3)) targetang += 16;
+                        if (extBits&BIT(EXT_STRAFELEFT)) targetang -= 16;
+                        else if (extBits&BIT(EXT_STRAFERIGHT)) targetang += 16;
                         else if (targetang > 0) targetang -= targetang>>2;
                         else if (targetang < 0) targetang += (-targetang)>>2;
                     }
@@ -4065,7 +4066,7 @@ void G_DoSpriteAnimations(int32_t ourx, int32_t oury, int32_t ourz, int32_t oura
                     spritesortcnt++;
                 }
 
-                if (g_player[playerNum].input.extbits & (1 << 7) && !ud.pause_on && spritesortcnt < maxspritesonscreen)
+                if (g_player[playerNum].input.extbits & (1 << EXT_TYPING) && !ud.pause_on && spritesortcnt < maxspritesonscreen)
                 {
                     auto const playerTyping = &tsprite[spritesortcnt];
 

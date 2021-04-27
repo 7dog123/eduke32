@@ -3135,7 +3135,7 @@ void P_GetInput(int const playerNum)
         thisPlayer.lastViewUpdate = 0;
         localInput = {};
         localInput.bits    = (((int32_t)g_gameQuit) << SK_GAMEQUIT);
-        localInput.extbits |= (1<<7);
+        localInput.extbits |= (1<<EXT_TYPING);
 
         return;
     }
@@ -3376,13 +3376,14 @@ void P_GetInput(int const playerNum)
     if (PWEAPON(playerNum, pPlayer->curr_weapon, Flags) & WEAPON_SEMIAUTO && BUTTON(gamefunc_Fire))
         CONTROL_ClearButton(gamefunc_Fire);
 
-    localInput.extbits |= (BUTTON(gamefunc_Move_Forward) || (input.fvel > 0));
-    localInput.extbits |= (BUTTON(gamefunc_Move_Backward) || (input.fvel < 0)) << 1;
-    localInput.extbits |= (BUTTON(gamefunc_Strafe_Left) || (input.svel > 0)) << 2;
-    localInput.extbits |= (BUTTON(gamefunc_Strafe_Right) || (input.svel < 0)) << 3;
-    localInput.extbits |= BUTTON(gamefunc_Turn_Left)<<4;
-    localInput.extbits |= BUTTON(gamefunc_Turn_Right)<<5;
-    localInput.extbits |= BUTTON(gamefunc_Alt_Fire)<<6;
+    localInput.extbits |= (BUTTON(gamefunc_Move_Forward) || (input.fvel > 0)) << EXT_FWD;
+    localInput.extbits |= (BUTTON(gamefunc_Move_Backward) || (input.fvel < 0)) << EXT_BACK;
+    localInput.extbits |= (BUTTON(gamefunc_Strafe_Left) || (input.svel > 0)) << EXT_STRAFELEFT;
+    localInput.extbits |= (BUTTON(gamefunc_Strafe_Right) || (input.svel < 0)) << EXT_STRAFERIGHT;
+    localInput.extbits |= BUTTON(gamefunc_Turn_Left)<<EXT_TURNLEFT;
+    localInput.extbits |= BUTTON(gamefunc_Turn_Right)<<EXT_TURNRIGHT;
+    localInput.extbits |= BUTTON(gamefunc_Alt_Fire)<<EXT_ALTFIRE;
+    localInput.extbits |= (CONTROL_LastSeenInput == LastSeenInput::Joystick && ud.config.JoystickViewCentering)<<EXT_CENTERING;
 
     int const movementLocked = P_CheckLockedMovement(playerNum);
 
@@ -4226,7 +4227,7 @@ static void P_ProcessWeapon(int playerNum)
     }
 
     bool const doFire    = (playerBits & BIT(SK_FIRE) && (*weaponFrame) == 0);
-    bool const doAltFire = g_player[playerNum].input.extbits & (1 << 6);
+    bool const doAltFire = g_player[playerNum].input.extbits & BIT(EXT_ALTFIRE);
 
     if (doAltFire)
     {
@@ -5517,15 +5518,15 @@ void P_ProcessInput(int playerNum)
         }
     }
 
-    if (pInput.extbits & (1))      VM_OnEvent(EVENT_MOVEFORWARD,  pPlayer->i, playerNum);
-    if (pInput.extbits & (1 << 1)) VM_OnEvent(EVENT_MOVEBACKWARD, pPlayer->i, playerNum);
-    if (pInput.extbits & (1 << 2)) VM_OnEvent(EVENT_STRAFELEFT,   pPlayer->i, playerNum);
-    if (pInput.extbits & (1 << 3)) VM_OnEvent(EVENT_STRAFERIGHT,  pPlayer->i, playerNum);
+    if (pInput.extbits & BIT(EXT_FWD))         VM_OnEvent(EVENT_MOVEFORWARD,  pPlayer->i, playerNum);
+    if (pInput.extbits & BIT(EXT_BACK))        VM_OnEvent(EVENT_MOVEBACKWARD, pPlayer->i, playerNum);
+    if (pInput.extbits & BIT(EXT_STRAFELEFT))  VM_OnEvent(EVENT_STRAFELEFT,   pPlayer->i, playerNum);
+    if (pInput.extbits & BIT(EXT_STRAFERIGHT)) VM_OnEvent(EVENT_STRAFERIGHT,  pPlayer->i, playerNum);
 
-    if (pInput.extbits & (1 << 4) || pInput.q16avel < 0)
+    if (pInput.extbits & BIT(EXT_TURNLEFT) || pInput.q16avel < 0)
         VM_OnEvent(EVENT_TURNLEFT, pPlayer->i, playerNum);
 
-    if (pInput.extbits & (1 << 5) || pInput.q16avel > 0)
+    if (pInput.extbits & BIT(EXT_TURNRIGHT) || pInput.q16avel > 0)
         VM_OnEvent(EVENT_TURNRIGHT, pPlayer->i, playerNum);
 
     if (pPlayer->vel.x || pPlayer->vel.y || pInput.fvel || pInput.svel)
